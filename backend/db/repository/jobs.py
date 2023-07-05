@@ -16,3 +16,9 @@ def create_new_job(job: JobCreate, db: Session, owner_id: int):
 def get_job_by_id(id:int, db:Session):
     job = db.query(Job).filter(Job.id==id).first()
     return job
+
+
+def get_active_jobs(db:Session):
+    jobs = db.query(Job).filter(Job.is_active==True).all()
+    return jobs
+

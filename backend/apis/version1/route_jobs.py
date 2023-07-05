@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from typing import List
 
 from schemas.jobs import JobCreate, ShowJob
 from db.models.jobs import Job
 from db.session import get_db
-from db.repository.jobs import create_new_job, get_job_by_id
+from db.repository.jobs import create_new_job, get_job_by_id, get_active_jobs
 
 router = APIRouter()
 
@@ -15,10 +16,15 @@ def create_job(job:JobCreate, db:Session=Depends(get_db)):
     return job
 
 
-@router.get("/{id}", response_model=ShowJob)
+@router.get("/details/{id}", response_model=ShowJob)
 def get_job(id:int, db:Session=Depends(get_db)):
     job = get_job_by_id(id, db)
     if not job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Job with id {id} does not exist")
     return job
+
+@router.get("/all", response_model=List[ShowJob])
+def get_all_jobs(db:Session=Depends(get_db)):
+    jobs = get_active_jobs(db)
+    return jobs

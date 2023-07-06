@@ -5,7 +5,7 @@ from typing import List
 from schemas.jobs import JobCreate, ShowJob
 from db.models.jobs import Job
 from db.session import get_db
-from db.repository.jobs import create_new_job, get_job_by_id, get_active_jobs, update_job_by_id
+from db.repository.jobs import (create_new_job, get_job_by_id, get_active_jobs, update_job_by_id, delete_job_by_id)
 
 router = APIRouter()
 
@@ -38,3 +38,13 @@ def update_job(id:int, job:JobCreate, db:Session=Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Job with id {id} does not exist")
     return {"detail":"Job successfully updated"}
+
+
+@router.delete("/delete/{id}")
+def delete_job(id:int, db:Session=Depends(get_db)):
+    owner_id = 1
+    message = delete_job_by_id(id, db, owner_id)
+    if not message:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Job with id {id} does not exist")
+    return {"detail":"Job successfully deleted"}
